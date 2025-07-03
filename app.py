@@ -8,7 +8,6 @@ from transformers import pipeline
 
 model = None
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global model
@@ -40,5 +39,5 @@ EXAMPLES = {
 @app.post("/predict")
 def predict(request: PredictRequest = Body(..., openapi_examples=EXAMPLES)):
     assert model is not None
-    results = model(request.input, **request.parameters)
+    results = model(request.inputs, **request.parameters)
     return results
