@@ -40,5 +40,5 @@ EXAMPLES = {
 @app.post("/predict")
 def predict(request: PredictRequest = Body(..., openapi_examples=EXAMPLES)):
     assert model is not None
-    results = model(request.inputs, **request.parameters)
+    results = model(request.input, **request.parameters)
     return results
