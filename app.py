@@ -11,14 +11,14 @@ app = FastAPI()
 
 # Define request model
 class PredictRequest(BaseModel):
-    inputs: List[str]  # Change 'input' to 'inputs' or adjust accordingly
+    inputs: List[str]  # Changed 'input' to 'inputs'
     parameters: Optional[Dict[str, Any]] = None
 
 @app.post("/predict")
 def predict(request: PredictRequest):
     try:
         # Assuming model is already defined
-        results = model(request.inputs, **request.parameters)  # Use 'inputs' instead of 'input'
+        results = model(request.inputs, **request.parameters)  # Updated to use 'inputs' instead of 'input'
         return JSONResponse(content=results)
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
