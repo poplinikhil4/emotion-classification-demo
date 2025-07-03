@@ -10,7 +10,7 @@ model = None
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+def lifespan(app: FastAPI):
     global model
     model = pipeline(
         "text-classification",
@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    lifespan=lifespan, docs_url="/", root_path=os.getenv("TFY_SERVICE_ROOT_PATH")
+    lifespan=lifespan, doc_url="/", root_path=os.getenv("TFY_SERVICE_ROOT_PATH")
 )
 
 
@@ -32,7 +32,7 @@ class PredictRequest(BaseModel):
 EXAMPLES = {
     "example-request": {
         "summary": "Example predict request",
-        "value": PredictRequest(inputs=["I am happy", "I am angry", "I am sad"]).dict(),
+        "value": PredictRequest(inputs=["I am happy", "I am angry", "I am sad"], parameters={}).dict(),
     }
 }
 
@@ -40,5 +40,5 @@ EXAMPLES = {
 @app.post("/predict")
 def predict(request: PredictRequest = Body(..., openapi_examples=EXAMPLES)):
     assert model is not None
-    results = model(request.input, **request.parameters)
+    results = model(request.inputs, **request.parameters)
     return results
