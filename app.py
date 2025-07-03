@@ -18,7 +18,7 @@ class PredictRequest(BaseModel):
 def predict(request: PredictRequest):
     try:
         # Assuming model is already defined
-        results = model(request.inputs, **request.parameters)  # Use 'inputs' instead of 'input'
+        results = model(request.inputs, **(request.parameters or {}))  # Correctly access 'inputs'
         return JSONResponse(content=results)
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
