@@ -8,7 +8,6 @@ from transformers import pipeline
 
 model = None
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global model
@@ -18,16 +17,13 @@ async def lifespan(app: FastAPI):
     )
     yield
 
-
 app = FastAPI(
     lifespan=lifespan, docs_url="/", root_path=os.getenv("TFY_SERVICE_ROOT_PATH")
 )
 
-
 class PredictRequest(BaseModel):
     inputs: Union[List[str], str]
     parameters: Dict[str, Any] = Field(default_factory=dict)
-
 
 EXAMPLES = {
     "example-request": {
@@ -36,9 +32,8 @@ EXAMPLES = {
     }
 }
 
-
 @app.post("/predict")
 def predict(request: PredictRequest = Body(..., openapi_examples=EXAMPLES)):
     assert model is not None
-    results = model(request.input, **request.parameters)
+    results = model(request.inputs, **request.parameters)
     return results
