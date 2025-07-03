@@ -1,44 +1,24 @@
 import os
 from contextlib import asynccontextmanager
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional
 
-from fastapi import Body, FastAPI
-from pydantic import BaseModel, Field
-from transformers import pipeline
+from fastapi import FastAPI, Depends
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
-model = None
+# Initialize the FastAPI app
+app = FastAPI()
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    global model
-    model = pipeline(
-        "text-classification",
-        model="bhadresh-savani/albert-base-v2-emotion",
-    )
-    yield
-
-
-app = FastAPI(
-    lifespan=lifespan, docs_url="/", root_path=os.getenv("TFY_SERVICE_ROOT_PATH")
-)
-
-
+# Define request model
 class PredictRequest(BaseModel):
-    inputs: Union[List[str], str]
-    parameters: Dict[str, Any] = Field(default_factory=dict)
-
-
-EXAMPLES = {
-    "example-request": {
-        "summary": "Example predict request",
-        "value": PredictRequest(inputs=["I am happy", "I am angry", "I am sad"]).dict(),
-    }
-}
-
+    inputs: List[str]  # Change 'input' to 'inputs' or adjust accordingly
+    parameters: Optional[Dict[str, Any]] = None
 
 @app.post("/predict")
-def predict(request: PredictRequest = Body(..., openapi_examples=EXAMPLES)):
-    assert model is not None
-    results = model(request.input, **request.parameters)
-    return results
+def predict(request: PredictRequest):
+    try:
+        # Assuming model is already defined
+        results = model(request.inputs, **request.parameters)  # Use 'inputs' instead of 'input'
+        return JSONResponse(content=results)
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
